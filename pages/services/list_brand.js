@@ -1,5 +1,5 @@
 
-const list_brand = [
+export const list_brand = [
     {"name": "Visa", "id": "visa"},
     {"name": "Master", "id": "master"},
     {"name": "Amex", "id": "amex"},
@@ -11,5 +11,3 @@ const list_brand = [
     {"name": "Hipercard", "id": "hipercard"},
     {"name": "Hiper", "id": "hiper"}
 ]
-
-export default list_brand
