@@ -37,9 +37,7 @@ const App = () => {
                         <div className="inline-flex justify-center rounded-md border w-48
                                                         border-transparent py-2 px-4 text-sm 
                                                         font-medium focus:outline-none focus:ring-2 focus:ring-offset-2">
-                            <img 
-                                src="https://thumbs.dreamstime.com/b/donate-button-line-icon-help-vector-illustration-isolated-white-online-donation-outline-style-design-designed-web-145940111.jpg"
-                                width={200}/>
+                            Imagem
                         </div>
                     </div>   
 
