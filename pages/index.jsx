@@ -1,7 +1,7 @@
 
 import Input from "./components/Inputs";
 import {useState} from 'react'
-import list_brand from "./services/list_brand";
+import list_brand from "../services/list_brand";
 
 const LoadCard = () => {
     return (
