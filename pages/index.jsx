@@ -1,15 +1,16 @@
 
 import Input from "./components/Inputs";
-import {useState} from 'react'
+import {useState, useEffect} from 'react'
 import list_brand from "../services/list_brand";
+import axios from "axios";
+import { useRouter } from 'next/router'
 
-const LoadCard = () => {
+const TerminalStatus = () => {
     return (
-        <>
-            <div className="mt-5 md:col-span-2 md:mt-0 md:px-80 pl-10">
-                Carregando ...
-            </div>
-            
+        <>             
+            <h1>
+                Terminal: <span className="text-green-600">Habilitado</span>
+            </h1>
         </>
     )
 }
@@ -17,19 +18,64 @@ const LoadCard = () => {
 const App = () => {
 
     const [load, setLoad] = useState(false)
+    const [activeTerminal, setActiveTerminal] = useState(false)
+    const urlTerminal = "https://backend-cans.herokuapp.com"
+    const router = useRouter()
 
     const submitForm = (event) => {
         event.preventDefault()
 
         const params = event.target
         
-        params.button_submit.disabled = true
+        //params.button_submit.disabled = true
 
         setLoad(true)
+
+        const expiration = `${params.exp_card_donate.value.substr(5, 2)}/${params.exp_card_donate.value.substr(0, 4)}`
+
+        const payload = JSON.stringify({
+            "value": parseInt(params.value_donate.value),
+            "email": params.email_donate.value,
+            "donate_type": "CreditCard",  
+            "card_number": {
+                "customer_name": params.name_donate.value,
+                "card_number": params.card_number_donate.value.split(" ").join(""),
+                "holder": params.cvv_donate.value,
+                "expiration_date": expiration,
+                "brand": params.brand_donate.value
+            }
+        })
+
+        axios({
+            method: 'post',
+            url: `${urlTerminal}/client/donates/without-account`,
+            headers: {'Content-Type': 'application/json'},
+            data: payload
+        }).then(
+            resp => {
+                console.log(resp.data.id)
+                router.push({
+                    pathname: "/success",
+                    query: { id: resp.data.id}
+                })
+            }
+        ).catch(
+            error => console.log(error)
+        )
     }
+
+    useEffect(() => {
+        axios({
+            method: 'get',
+            url: `${urlTerminal}/health-check`
+          })
+          .then(resp => setActiveTerminal(true))
+          .catch(error => setActiveTerminal(false))
+    }, [])
     
     return (
         <>
+            {activeTerminal && <TerminalStatus/>}
             <div className="mt-5 md:col-span-2 md:mt-0 md:px-80 pl-10">
                 <div className="sm:overflow-hidden sm:rounded-md">
 
@@ -101,7 +147,6 @@ const App = () => {
                                     </label>                                
                                     <div className="mt-1 flex rounded-md shadow-sm">                                    
                                         <select 
-                                            onChange={e => updateCurrency(e.target.value)}
                                             name="brand_donate"
                                             className="block w-full flex-1 rounded border-gray-300 focus:border-green-500 
                                                     focus:ring-green-500 sm:text-sm">
@@ -135,7 +180,15 @@ const App = () => {
                 </div>
             </div>
 
-            {load && <LoadCard/>}
+            {
+                load && 
+
+                    <div className="mt-5 md:col-span-2 md:mt-0 md:px-80 pl-10">
+                        <h2 className="text-blue-600">
+                            Carregando ...
+                        </h2>                        
+                    </div>
+            }
 
         </>
     )
