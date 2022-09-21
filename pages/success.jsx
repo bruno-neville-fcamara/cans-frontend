@@ -38,7 +38,7 @@ const Sucess = () => {
             {payload &&
                 <div className='container'>
                     <div className='relative md:left-52 md:top-10 left-1 top-4'>
-                        <table class="table-auto border border-slate-500">
+                        <table className="table-auto border border-slate-500">
                             <tbody >
                                 <tr className='border border-slate-500'>
                                     <td>ID: </td>
