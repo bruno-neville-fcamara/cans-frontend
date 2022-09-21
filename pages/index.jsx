@@ -24,9 +24,9 @@ const App = () => {
         setLoad(true)
 
         const expiration = `${params.exp_card_donate.value.substr(5, 2)}/${params.exp_card_donate.value.substr(0, 4)}`
-
+        
         const payload = JSON.stringify({
-            "value": parseInt(params.value_donate.value),
+            "value": parseInt(params.value_donate.value.replace(".", "").replace(",", "")),
             "email": params.email_donate.value,
             "donate_type": "CreditCard",  
             "card_number": {

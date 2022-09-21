@@ -33,6 +33,14 @@ const Sucess = () => {
         }
     }
 
+    const setValue = (value) => {        
+        const value_data = value.toString()
+
+        const total = value_data.length;
+        
+        return `${value_data.substr(0, total-2)}.${value_data.substr(total-2, total)}`
+    }
+
     return (
         <>
             {payload &&
@@ -58,7 +66,7 @@ const Sucess = () => {
                                 </tr>
                                 <tr className='border border-slate-500'>
                                     <td>VALUE: </td>
-                                    <td className='text-center'>{payload.authorization.Payment.Amount}</td>
+                                    <td className='text-center'>{setValue(payload.authorization.Payment.Amount)}</td>
                                 </tr>
                             </tbody>
                         </table>
