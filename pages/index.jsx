@@ -5,20 +5,12 @@ import list_brand from "../services/list_brand";
 import axios from "axios";
 import { useRouter } from 'next/router'
 
-const TerminalStatus = () => {
-    return (
-        <>             
-            <h1>
-                Terminal: <span className="text-green-600">Habilitado</span>
-            </h1>
-        </>
-    )
-}
 
 const App = () => {
 
     const [load, setLoad] = useState(false)
     const [activeTerminal, setActiveTerminal] = useState(false)
+    const [errors, setErrors] = useState(false)
     const urlTerminal = "https://backend-cans.herokuapp.com"
     const router = useRouter()
 
@@ -60,7 +52,7 @@ const App = () => {
                 })
             }
         ).catch(
-            error => console.log(error)
+            error => setErrors(true)
         )
     }
 
@@ -75,7 +67,16 @@ const App = () => {
     
     return (
         <>
-            {activeTerminal && <TerminalStatus/>}
+            {activeTerminal && 
+                <h1>
+                    Terminal: <span className="text-green-600">Habilitado</span>
+                </h1>
+            }
+            {errors && 
+                <h1>
+                    Requisição: <span className="text-red-600">Erro ao Enviar</span>
+                </h1>
+            }
             <div className="mt-5 md:col-span-2 md:mt-0 md:px-80 pl-10">
                 <div className="sm:overflow-hidden sm:rounded-md">
 
@@ -124,7 +125,7 @@ const App = () => {
                                         title="Expiration Date"
                                         name_object="exp_card_donate"
                                         placeholder="YYYY/MM"
-                                        type="date"
+                                        type="text"
                                     />                                              
                                 </div>
                                 <div className="col-span-3 sm:col-span-1">
@@ -161,7 +162,8 @@ const App = () => {
                                     <Input 
                                         title="Value"
                                         name_object="value_donate"
-                                        type="number"
+                                        placeholder="234.58"
+                                        type="text"
                                     />
                                 </div>                           
                             </div>   

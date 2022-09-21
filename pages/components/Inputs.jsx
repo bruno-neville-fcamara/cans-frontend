@@ -21,6 +21,7 @@ const Input = ({
                     name={name_object}
                     id={name_object}
                     value={value}
+                    required
                     className="block w-full flex-1 rounded border-gray-300 focus:border-green-500 
                                 focus:ring-green-500 sm:text-sm" 
                     placeholder={placeholder}

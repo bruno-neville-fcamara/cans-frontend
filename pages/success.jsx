@@ -9,6 +9,7 @@ const Sucess = () => {
     const urlTerminal = `https://backend-cans.herokuapp.com/client/donates/details/${id}`
     const [payload, setPayload] = useState()
     
+    
     axios({
         url: urlTerminal,
         method: 'get'
@@ -16,10 +17,12 @@ const Sucess = () => {
         resp => setPayload(
             resp.data
         )
-           
+            
     ).catch(
         error => console.log(error)
     )
+    
+    
 
     const setStatus = (value) =>{
         switch (value) {
@@ -32,12 +35,9 @@ const Sucess = () => {
 
     return (
         <>
-            {/* Sucesso na requisição {id} */}
-            {/* {payload && JSON.stringify(payload)} */}
-
             {payload &&
-                <div className='container'>
-                    <div className='relative md:left-52 md:top-10 left-1 top-4'>
+                <div>
+                    <div className='relative md:left-1/3 md:top-10 left-1 top-4'>
                         <table className="table-auto border border-slate-500">
                             <tbody >
                                 <tr className='border border-slate-500'>
@@ -65,8 +65,6 @@ const Sucess = () => {
                     </div>
                 </div>
             }
-
-            {/* {payload && payload.id} */}
         </>
     )
 }
