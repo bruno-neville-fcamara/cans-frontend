@@ -65,6 +65,10 @@ const Sucess = () => {
                                     <td className='text-center'>{payload.ica}</td>
                                 </tr>
                                 <tr className='border border-slate-500'>
+                                    <td>CREATED AT: </td>
+                                    <td className='text-center'>{payload.authorization.Payment.ReceivedDate}</td>
+                                </tr>
+                                <tr className='border border-slate-500'>
                                     <td>VALUE: </td>
                                     <td className='text-center'>{setValue(payload.authorization.Payment.Amount)}</td>
                                 </tr>
