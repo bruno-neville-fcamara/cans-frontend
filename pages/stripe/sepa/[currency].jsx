@@ -1,19 +1,45 @@
 
-import Input from "./components/Inputs";
+import Input from "../../components/Inputs";
 import {useState, useEffect} from 'react'
-import list_brand from "../services/list_brand";
+import list_country from "../../../services/list_country";
 import axios from "axios";
 import { useRouter } from 'next/router'
 import CurrencyInput from 'react-currency-input-field';
 
 
 const App = () => {
-
+    
     const [load, setLoad] = useState(false)
     const [activeTerminal, setActiveTerminal] = useState(false)
     const [errors, setErrors] = useState(false)
+    const [success, setSuccess] = useState(false)
     const urlTerminal = "https://backend-cans.herokuapp.com"
-    const router = useRouter()
+    const router = useRouter()    
+
+    const currency = () => {
+        const data = router.query.currency
+
+        if(data == "euro"){
+            return { locale: 'en-US', currency: 'EUR' }
+        }else if(data == "dollar"){
+            return { locale: 'en-US', currency: 'USD' }
+        }else if(data == "real"){
+            return { locale: 'pt-BR', currency: 'BRL', decimalScale: 2 }
+        }
+        
+    }
+
+    const currency_raw = () => {
+        const data = router.query.currency
+
+        if(data == "euro"){
+            return "eur"
+        }else if(data == "dollar"){
+            return "usd"
+        }else if(data == "real"){
+            return "brl"
+        }
+    }
 
     const submitForm = (event) => {
         event.preventDefault()
@@ -24,33 +50,40 @@ const App = () => {
 
         setLoad(true)
 
-        const expiration = `${params.exp_card_donate.value.substr(5, 2)}/${params.exp_card_donate.value.substr(0, 4)}`
+        const value = params.value_donate.value
+                        .replace("R$", "")
+                        .replace("$", "")
+                        .replace("€", "")
+                        .replaceAll(".", "")
+                        .replaceAll(",", "")
+
         
-        const payload = JSON.stringify({
-            "value": parseInt(params.value_donate.value.replace(".", "").replace(",", "")),
-            "email": params.email_donate.value,
-            "donate_type": "CreditCard",  
-            "card_number": {
-                "customer_name": params.name_donate.value,
-                "card_number": params.card_number_donate.value.split(" ").join(""),
-                "holder": params.cvv_donate.value,
-                "expiration_date": expiration,
-                "brand": params.brand_donate.value
+        const iban = params.iban_donate.value
+                        .replaceAll(" ", "")
+
+        const payload = JSON.stringify(
+            {
+                "name": params.name_donate.value,
+                "email": params.email_donate.value,
+                "iban": iban,
+                "amount": parseInt(value),
+                "currency": currency_raw(),
+                "address": {
+                  "line1": params.address_line1_donate.value,
+                  "country": params.address_country_donate.value
+                }
             }
-        })
+        )        
 
         axios({
             method: 'post',
-            url: `${urlTerminal}/client/donates/without-account`,
+            url: `${urlTerminal}/client/donates/stripe`,
             headers: {'Content-Type': 'application/json'},
             data: payload
         }).then(
             resp => {
                 console.log(resp.data.id)
-                router.push({
-                    pathname: "/success",
-                    query: { id: resp.data.id}
-                })
+                setSuccess(true)
             }
         ).catch(
             error => setErrors(true)
@@ -64,6 +97,7 @@ const App = () => {
           })
           .then(resp => setActiveTerminal(true))
           .catch(error => setActiveTerminal(false))
+        
     }, [])
     
     return (
@@ -75,7 +109,12 @@ const App = () => {
             }
             {errors && 
                 <h1>
-                    Requisição: <span className="text-red-600">Erro ao Enviar</span>
+                    Request: <span className="text-red-600">Send Error!</span>
+                </h1>
+            }
+            {success && 
+                <h1>
+                    Request: <span className="text-green-600">Sucess Send!</span>
                 </h1>
             }
             <div className="mt-5 md:col-span-2 md:mt-0 md:px-80 pl-10">
@@ -106,79 +145,70 @@ const App = () => {
                                     <Input 
                                         title="Name"
                                         name_object="name_donate"
-                                        placeholder="Bruno Neville"
+                                        placeholder="Your Name"
                                         type="text"
                                     />                                
                                 </div>
                             </div>
 
                             <div className="grid grid-cols-4 gap-6">
-                                <div className="col-span-3 sm:col-span-2">
+                                <div className="col-span-3 sm:col-span-3">
                                     <Input 
-                                        title="Card Number"
-                                        name_object="card_number_donate"
-                                        placeholder="12345678910111213"
+                                        title="Address Line"
+                                        name_object="address_line1_donate"
+                                        placeholder="Frankfurt"
                                         type="text"
                                     />
                                 </div>
-                                <div className="col-span-3 sm:col-span-1">
-                                    <Input 
-                                        title="Expiration Date"
-                                        name_object="exp_card_donate"
-                                        placeholder="YYYY/MM"
-                                        type="text"
-                                    />                                              
-                                </div>
-                                <div className="col-span-3 sm:col-span-1">
-                                    <Input 
-                                        title="CVV"
-                                        name_object="cvv_donate"
-                                        placeholder="CVV"
-                                        type="text"
-                                    />                                              
-                                </div>
-                            </div>
 
-                            <div className="grid grid-cols-4 gap-6">
-                                <div className="col-span-3 sm:col-span-2">
+                                <div className="col-span-3 sm:col-span-1">
 
                                     <label 
-                                        htmlFor="currency-donate" 
+                                        htmlFor="address_country_donate" 
                                         className="block text-sm font-medium text-gray-700">                                     
-                                        Brand
+                                        Address Country
                                     </label>                                
                                     <div className="mt-1 flex rounded-md shadow-sm">                                    
                                         <select 
-                                            name="brand_donate"
+                                            name="address_country_donate"
+                                            required
                                             className="block w-full flex-1 rounded border-gray-300 focus:border-green-500 
                                                     focus:ring-green-500 sm:text-sm">
                                             
                                             {
-                                                list_brand.map((currency) => <option key={currency.id} value={currency.id}>{currency.name}</option> )
+                                                list_country.map((currency) => <option key={currency.id} value={currency.id}>{currency.name}</option> )
                                             }
                                         </select>  
                                     </div> 
                                 </div>
-                                <div className="col-span-3 sm:col-span-2">
-                                    {/* <Input 
-                                        title="Value"
-                                        name_object="value_donate"
-                                        placeholder="234.58"
+                                
+                            </div>
+
+                            <div className="grid grid-cols-4 gap-6">
+                                <div className="col-span-3 sm:col-span-3">
+                                    <Input 
+                                        title="IBAN"
+                                        name_object="iban_donate"
+                                        placeholder="AT611904300234573201"
                                         type="text"
-                                    /> */}
+                                    />
+                                </div>
+                                <div className="col-span-3 sm:col-span-1">                                        
                                     <label 
                                         htmlFor="value_donate"
                                         className="block text-sm font-medium text-gray-700">                                         
                                         Value
                                     </label>
+
                                     <CurrencyInput                                        
                                         id="value_donate"
                                         name="value_donate"
+                                        required
                                         className="block w-full flex-1 rounded border-gray-300 focus:border-green-500 
                                         focus:ring-green-500 sm:text-sm"
-                                        placeholder="Please enter a number"                                        
-                                        intlConfig={{ locale: 'en-US', currency: 'USD' }}
-                                    />
+                                        intlConfig={currency()}
+                                    />                                       
+                                    
                                 </div>                           
                             </div>   
 
