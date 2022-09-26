@@ -16,6 +16,54 @@ const App = () => {
     const urlTerminal = "https://backend-cans.herokuapp.com"
     const router = useRouter()    
 
+
+    const routerValue = () => {
+        try {   
+            if(router.query.value) {
+                const value = router.query.value
+                return(
+                    <>
+                        <CurrencyInput                                        
+                            id="value_donate"
+                            name="value_donate"
+                            required
+                            disabled
+                            value={value}
+                            className="block w-full flex-1 rounded border-gray-300 focus:border-green-500 
+                            focus:ring-green-500 sm:text-sm"
+                            intlConfig={currency()}
+                        /> 
+                    </>
+                )
+            }else{
+                return (
+                    <>
+                        <CurrencyInput                                        
+                            id="value_donate"
+                            name="value_donate"
+                            required
+                            className="block w-full flex-1 rounded border-gray-300 focus:border-green-500 
+                            focus:ring-green-500 sm:text-sm"
+                            intlConfig={currency()}
+                        /> 
+                    </>)
+            }
+        } catch (error) {
+            return (
+                <>
+                    <CurrencyInput                                        
+                        id="value_donate"
+                        name="value_donate"
+                        required
+                        className="block w-full flex-1 rounded border-gray-300 focus:border-green-500 
+                        focus:ring-green-500 sm:text-sm"
+                        intlConfig={currency()}
+                    /> 
+                </>)
+        }
+    
+    }
+
     const currency = () => {
         const data = router.query.currency
 
@@ -199,15 +247,9 @@ const App = () => {
                                         className="block text-sm font-medium text-gray-700">                                         
                                         Value
                                     </label>
+                                    {routerValue()}
 
-                                    <CurrencyInput                                        
-                                        id="value_donate"
-                                        name="value_donate"
-                                        required
-                                        className="block w-full flex-1 rounded border-gray-300 focus:border-green-500 
-                                        focus:ring-green-500 sm:text-sm"
-                                        intlConfig={currency()}
-                                    />                                       
+                                                                         
                                     
                                 </div>                           
                             </div>   
